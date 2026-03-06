@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import { ItemDetailSkeleton } from "@/components/Skeleton";
+import { useToast } from "@/components/Toast";
 import { Star, ChevronRight, Minus, Plus, Wine, Clock, Flame, Info, AlertTriangle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useButtonClick } from "@/hooks";
@@ -61,6 +62,8 @@ export default function ItemDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [pairing, setPairing] = useState(false);
 
+  const { addToast } = useToast();
+
   const { handleClick: addToCart, isLoading: isAdding } = useButtonClick(async () => {
     if (!item) return;
     
@@ -81,10 +84,16 @@ export default function ItemDetailPage() {
       
       const result = await response.json();
       if (result.success) {
-        window.location.href = `/${locale}/cart`;
+        addToast(isAr ? "تمت إضافة العنصر إلى السلة" : "Item added to cart", "success");
+        setTimeout(() => {
+          window.location.href = `/${locale}/cart`;
+        }, 1000);
+      } else {
+        addToast(isAr ? "فشل في إضافة العنصر" : "Failed to add item", "error");
       }
     } catch (err) {
       console.error("Failed to add to cart:", err);
+      addToast(isAr ? "حدث خطأ" : "An error occurred", "error");
     }
   }, { debounceMs: 1000 });
 

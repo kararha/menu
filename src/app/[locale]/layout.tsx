@@ -3,6 +3,7 @@ import { getMessages } from "next-intl/server";
 import { Work_Sans, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
+import { ToastProvider } from "@/components/Toast";
 import "../globals.css";
 
 const workSans = Work_Sans({
@@ -44,9 +45,11 @@ export default async function LocaleLayout({
                             : "'Work Sans', sans-serif",
                 }}
             >
-                <NextIntlClientProvider locale={locale} messages={messages}>
-                    {children}
-                </NextIntlClientProvider>
+                <ToastProvider>
+                    <NextIntlClientProvider locale={locale} messages={messages}>
+                        {children}
+                    </NextIntlClientProvider>
+                </ToastProvider>
             </body>
         </html>
     );
