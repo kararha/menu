@@ -29,7 +29,7 @@ export default function HomePage() {
                 <aside className="hidden w-56 shrink-0 lg:block">
                     <h2 className="text-2xl font-bold text-white">{t("menuTitle")}</h2>
                     <p className="mb-6 mt-1 text-sm text-text-secondary">
-                        {t("menuSubtitle")}
+                        {t("menuSubtitle")} - Dev branch test
                     </p>
 
                     <nav className="flex flex-col gap-1">
