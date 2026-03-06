@@ -4,20 +4,37 @@ import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
-import { categoryItems } from "@/data/mockData";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Star, Clock, Flame } from "lucide-react";
+import { Pagination, PaginationInfo } from "@/components/Pagination";
+import { MenuGridSkeleton } from "@/components/Skeleton";
+import { useMenu, useButtonClick } from "@/hooks";
 
 export default function CategoryPage() {
     const t = useTranslations("Category");
     const locale = useLocale();
     const isAr = locale === "ar";
 
+    const {
+        items,
+        pagination,
+        loading,
+        category,
+        dietary,
+        goToPage,
+        changeCategory,
+        toggleDietary,
+    } = useMenu({
+        initialPage: 1,
+        initialLimit: 9,
+        initialCategory: "mains",
+    });
+
     const sidebarCategories = [
-        { id: "all", label: t("allMains"), active: true },
-        { id: "land", label: t("fromLand"), active: false },
-        { id: "sea", label: t("fromSea"), active: false },
-        { id: "veg", label: t("vegetarian"), active: false },
-        { id: "gf", label: t("glutenFree"), active: false },
+        { id: "all", label: t("allMains") },
+        { id: "land", label: t("fromLand") },
+        { id: "sea", label: t("fromSea") },
+        { id: "veg", label: t("vegetarian") },
+        { id: "gf", label: t("glutenFree") },
     ];
 
     const dietaryFilters = [
@@ -25,6 +42,11 @@ export default function CategoryPage() {
         { id: "nutfree", label: t("nutFree") },
         { id: "dairyfree", label: t("dairyFree") },
     ];
+
+    const handleAddToCart = useButtonClick(async (itemId: number) => {
+        // API call to add to cart would go here
+        console.log("Adding item to cart:", itemId);
+    }, { debounceMs: 800 });
 
     return (
         <div className="min-h-screen bg-surface-dark">
@@ -36,10 +58,12 @@ export default function CategoryPage() {
                         {sidebarCategories.map((cat) => (
                             <button
                                 key={cat.id}
-                                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-start text-sm font-medium transition-all ${cat.active
+                                onClick={() => changeCategory(cat.id)}
+                                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-start text-sm font-medium transition-all ${
+                                    category === cat.id
                                         ? "bg-brand text-white"
                                         : "text-text-secondary hover:bg-surface-card hover:text-white"
-                                    }`}
+                                }`}
                             >
                                 {cat.label}
                             </button>
@@ -58,6 +82,8 @@ export default function CategoryPage() {
                             >
                                 <input
                                     type="checkbox"
+                                    checked={dietary.includes(f.id)}
+                                    onChange={() => toggleDietary(f.id)}
                                     className="h-4 w-4 rounded border-border-subtle bg-surface-card text-brand accent-brand focus:ring-brand"
                                 />
                                 {f.label}
@@ -104,69 +130,110 @@ export default function CategoryPage() {
                     <p className="mb-6 text-sm text-text-secondary">{t("subtitle")}</p>
 
                     {/* Grid */}
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                        {categoryItems.map((item) => (
-                            <Link
-                                key={item.id}
-                                href={`/${locale}/item`}
-                                className="group overflow-hidden rounded-xl border border-border-subtle bg-surface-card transition-all hover:border-brand/40 hover:shadow-lg hover:shadow-brand/5"
-                            >
-                                <div className="relative h-48 overflow-hidden">
-                                    <Image
-                                        src={item.image}
-                                        alt={isAr ? item.nameAr : item.name}
-                                        fill
-                                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                    {item.badge && (
-                                        <span
-                                            className={`absolute start-3 top-3 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white ${item.badgeColor === "blue"
-                                                    ? "bg-blue-600"
-                                                    : "bg-green-600"
-                                                }`}
-                                        >
-                                            {item.badge === "chefsChoice"
-                                                ? t("chefsChoice")
-                                                : t("vegan")}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="p-4">
-                                    <div className="flex items-start justify-between gap-2">
-                                        <h3 className="font-semibold text-white">
-                                            {isAr ? item.nameAr : item.name}
-                                        </h3>
-                                        <span className="shrink-0 font-bold text-brand">
-                                            ${item.price}
-                                        </span>
-                                    </div>
-                                    <p className="mt-2 text-xs text-text-secondary line-clamp-2">
-                                        {isAr ? item.descriptionAr : item.description}
-                                    </p>
-                                    <div className="mt-3 flex items-center justify-end">
-                                        <span className="text-sm font-medium text-brand transition-colors group-hover:text-brand-light">
-                                            {t("viewDetailsLink")} →
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
+                    {loading ? (
+                        <MenuGridSkeleton count={9} />
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                                {items.map((item) => (
+                                    <Link
+                                        key={item.id}
+                                        href={`/${locale}/item?id=${item.id}`}
+                                        className="group overflow-hidden rounded-xl border border-border-subtle bg-surface-card transition-all hover:border-brand/40 hover:shadow-lg hover:shadow-brand/5"
+                                    >
+                                        <div className="relative h-48 overflow-hidden">
+                                            <Image
+                                                src={item.image}
+                                                alt={isAr ? item.nameAr : item.name}
+                                                fill
+                                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                            {item.badge && (
+                                                <span
+                                                    className={`absolute start-3 top-3 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white ${
+                                                        item.badgeColor === "blue"
+                                                            ? "bg-blue-600"
+                                                            : item.badgeColor === "green"
+                                                            ? "bg-green-600"
+                                                            : item.badgeColor === "gold"
+                                                            ? "bg-amber-500"
+                                                            : "bg-orange-500"
+                                                    }`}
+                                                >
+                                                    {item.badge === "chefsChoice"
+                                                        ? t("chefsChoice")
+                                                        : item.badge === "vegan"
+                                                        ? t("vegan")
+                                                        : item.badge}
+                                                </span>
+                                            )}
+                                            {item.preparationTime && (
+                                                <div className="absolute bottom-3 end-3 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[10px] font-medium text-white">
+                                                    <Clock className="h-3 w-3" />
+                                                    {item.preparationTime} min
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="p-4">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <h3 className="font-semibold text-white">
+                                                    {isAr ? item.nameAr : item.name}
+                                                </h3>
+                                                <span className="shrink-0 font-bold text-brand">
+                                                    ${item.price}
+                                                </span>
+                                            </div>
+                                            <p className="mt-2 text-xs text-text-secondary line-clamp-2">
+                                                {isAr ? item.descriptionAr : item.description}
+                                            </p>
+                                            <div className="mt-3 flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    {item.rating && (
+                                                        <div className="flex items-center gap-1">
+                                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                                            <span className="text-xs text-text-secondary">
+                                                                {item.rating}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {item.spicyLevel && item.spicyLevel > 0 && (
+                                                        <div className="flex items-center gap-0.5">
+                                                            {Array.from({ length: item.spicyLevel }).map((_, i) => (
+                                                                <Flame
+                                                                    key={i}
+                                                                    className="h-3 w-3 text-orange-500"
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <span className="text-sm font-medium text-brand transition-colors group-hover:text-brand-light">
+                                                    {t("viewDetailsLink")} →
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
 
-                    {/* Pagination */}
-                    <div className="mt-8 flex items-center justify-center gap-2">
-                        {[1, 2, 3].map((page) => (
-                            <button
-                                key={page}
-                                className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-all ${page === 1
-                                        ? "bg-brand text-white"
-                                        : "border border-border-subtle text-text-secondary hover:border-brand hover:text-brand"
-                                    }`}
-                            >
-                                {page}
-                            </button>
-                        ))}
-                    </div>
+                            {/* Pagination */}
+                            {pagination && pagination.totalPages > 1 && (
+                                <div className="mt-8 flex flex-col items-center gap-4">
+                                    <PaginationInfo
+                                        page={pagination.page}
+                                        totalPages={pagination.totalPages}
+                                        totalItems={pagination.totalItems}
+                                        limit={pagination.limit}
+                                    />
+                                    <Pagination
+                                        currentPage={pagination.page}
+                                        totalPages={pagination.totalPages}
+                                        onPageChange={goToPage}
+                                    />
+                                </div>
+                            )}
+                        </>
+                    )}
                 </main>
             </div>
         </div>
