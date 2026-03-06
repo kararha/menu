@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Search, ShoppingBag, Globe } from "lucide-react";
+import { ShoppingBag, Globe } from "lucide-react";
 import { Icons } from "@/assets/icons";
+import { SearchBar } from "@/components/SearchBar";
 
 export default function Header() {
     const t = useTranslations("Nav");
@@ -47,13 +48,13 @@ export default function Header() {
                 {/* Right side */}
                 <div className="flex items-center gap-3">
                     {/* Search */}
-                    <div className="relative hidden md:block">
-                        <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-                        <input
-                            type="text"
-                            placeholder={t("searchPlaceholder")}
-                            className="h-9 w-48 rounded-full border border-border-subtle bg-surface-card ps-9 pe-4 text-sm text-white placeholder:text-text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                        />
+                    <div className="hidden md:block">
+                        <SearchBar />
+                    </div>
+
+                    {/* Mobile Search */}
+                    <div className="md:hidden">
+                        <SearchBar />
                     </div>
 
                     {/* Language Switch */}
