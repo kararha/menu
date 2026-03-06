@@ -39,7 +39,7 @@ export default function HomePage() {
                                 href={
                                     cat.id === "all"
                                         ? `/${locale}`
-                                        : `/${locale}/category`
+                                        : `/${locale}/${cat.id}`
                                 }
                                 className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${cat.active
                                         ? "bg-brand text-white"

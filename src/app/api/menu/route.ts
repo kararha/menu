@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "10");
   const category = searchParams.get("category") || "all";
+  const subcategory = searchParams.get("subcategory") || "";
   const search = searchParams.get("search") || "";
   const sortBy = searchParams.get("sortBy") || "popular";
   const dietary = searchParams.get("dietary")?.split(",").filter(Boolean) || [];
@@ -16,6 +17,11 @@ export async function GET(request: NextRequest) {
   // Filter by category
   if (category !== "all") {
     filteredItems = filteredItems.filter(item => item.category === category);
+  }
+
+  // Filter by subcategory
+  if (subcategory) {
+    filteredItems = filteredItems.filter(item => item.subcategory === subcategory);
   }
 
   // Filter by search
