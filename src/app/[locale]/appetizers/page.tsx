@@ -8,6 +8,7 @@ import { ChevronRight, Star, Clock, Flame, Sparkles } from "lucide-react";
 import { Pagination, PaginationInfo } from "@/components/Pagination";
 import { MenuGridSkeleton } from "@/components/Skeleton";
 import { useMenu } from "@/hooks";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/Animations";
 
 export default function AppetizersPage() {
   const t = useTranslations("Category");
@@ -97,8 +98,10 @@ export default function AppetizersPage() {
             <MenuGridSkeleton count={9} />
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item) => (
+              <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((item, index) => (
+                  <StaggerItem key={item.id}>
+                    <FadeIn delay={index * 0.05}>
                   <Link
                     key={item.id}
                     href={`/${locale}/item?id=${item.id}`}
