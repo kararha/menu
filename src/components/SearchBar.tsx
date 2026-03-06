@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, ArrowRight } from "lucide-react";
@@ -18,39 +18,52 @@ export function SearchBar({ className }: SearchBarProps) {
   const [inputValue, setInputValue] = useState("");
   const [results, setResults] = useState<typeof menuItems>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [debouncedQuery, setDebouncedQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(inputValue);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [inputValue]);
-
-  // Perform search
-  useEffect(() => {
-    if (!debouncedQuery || debouncedQuery.length < 2) {
+  // Debounced search
+  const performSearch = useCallback((query: string) => {
+    if (!query || query.length < 2) {
       setResults([]);
       return;
     }
 
     setIsSearching(true);
-    const query = debouncedQuery.toLowerCase();
+    const lowerQuery = query.toLowerCase();
 
-    // Fuzzy search logic
     const searchResults = menuItems.filter((item) => {
-      const nameMatch = item.name.toLowerCase().includes(query) || item.nameAr.includes(debouncedQuery);
-      const descMatch = item.description.toLowerCase().includes(query);
-      const catMatch = item.category.toLowerCase().includes(query);
+      const nameMatch = item.name.toLowerCase().includes(lowerQuery) || item.nameAr.includes(query);
+      const descMatch = item.description.toLowerCase().includes(lowerQuery);
+      const catMatch = item.category.toLowerCase().includes(lowerQuery);
       return nameMatch || descMatch || catMatch;
     });
 
     setResults(searchResults.slice(0, 8));
     setIsSearching(false);
-  }, [debouncedQuery]);
+  }, []);
+
+  // Handle input change with debounce
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    debounceRef.current = setTimeout(() => {
+      performSearch(value);
+    }, 300);
+  };
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   // Close on outside click
   useEffect(() => {
@@ -105,7 +118,7 @@ export function SearchBar({ className }: SearchBarProps) {
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value)}
             placeholder={isAr ? "ابحث عن طبق..." : "Search for dishes..."}
             className="flex-1 bg-transparent text-sm text-white placeholder:text-text-muted focus:outline-none"
           />
