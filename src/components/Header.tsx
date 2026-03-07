@@ -2,15 +2,23 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ShoppingBag, Globe } from "lucide-react";
+import { ShoppingBag, Globe, Menu, X } from "lucide-react";
 import { Icons } from "@/assets/icons";
 import { SearchBar } from "@/components/SearchBar";
+import { useState } from "react";
 
 export default function Header() {
     const t = useTranslations("Nav");
     const tc = useTranslations("Common");
     const locale = useLocale();
     const otherLocale = locale === "en" ? "ar" : "en";
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const navItems = [
+        { href: `/${locale}/reservations`, label: t("reservations") },
+        { href: `/${locale}/events`, label: t("events") },
+        { href: `/${locale}/gift-cards`, label: t("giftCards") },
+    ];
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border-subtle bg-surface-dark/95 backdrop-blur-md">
@@ -25,24 +33,15 @@ export default function Header() {
 
                 {/* Center Nav */}
                 <nav className="hidden items-center gap-6 md:flex">
-                    <Link
-                        href={`/${locale}/reservations`}
-                        className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
-                    >
-                        {t("reservations")}
-                    </Link>
-                    <Link
-                        href={`/${locale}/events`}
-                        className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
-                    >
-                        {t("events")}
-                    </Link>
-                    <Link
-                        href={`/${locale}/gift-cards`}
-                        className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
-                    >
-                        {t("giftCards")}
-                    </Link>
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
+                        >
+                            {item.label}
+                        </Link>
+                    ))}
                 </nav>
 
                 {/* Right side */}
@@ -69,13 +68,47 @@ export default function Header() {
                     {/* Order Now */}
                     <Link
                         href={`/${locale}/cart`}
-                        className="flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
+                        className="hidden sm:flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
                     >
                         <ShoppingBag className="h-4 w-4" />
                         {t("orderNow")}
                     </Link>
+
+                    {/* Mobile Menu Toggle */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="flex items-center justify-center p-2 text-text-secondary hover:text-white md:hidden"
+                    >
+                        {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
                 </div>
             </div>
+
+            {/* Mobile Menu */}
+            {mobileMenuOpen && (
+                <div className="border-t border-border-subtle bg-surface-dark md:hidden">
+                    <nav className="flex flex-col p-4">
+                        {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="rounded-lg px-4 py-3 text-sm font-medium text-text-secondary hover:bg-surface-card hover:text-white"
+                            >
+                                {item.label}
+                            </Link>
+                        ))}
+                        <Link
+                            href={`/${locale}/cart`}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="mt-2 flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white sm:hidden"
+                        >
+                            <ShoppingBag className="h-4 w-4" />
+                            {t("orderNow")}
+                        </Link>
+                    </nav>
+                </div>
+            )}
         </header>
     );
 }
