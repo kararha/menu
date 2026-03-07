@@ -280,7 +280,7 @@ export const menuItems: MenuItem[] = [
     price: 42,
     description: "Slow-cooked duck leg with cherry gastrique, roasted root vegetables, and parsnip purée",
     descriptionAr: "ساق بط مطهوة ببطء مع صلصة الكرز والخضروات الجذرية المحمصة",
-    image: "https://images.unsplash.com/photo-1432139509613-5c4255a1d916?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-ZWDTaJy_K1I?w=400&h=300&fit=crop",
     category: "mains",
     subcategory: "poultry",
     badge: "chefsChoice",
