@@ -91,8 +91,8 @@ export default function ItemDetailPage() {
       } else {
         addToast(isAr ? "فشل في إضافة العنصر" : "Failed to add item", "error");
       }
-    } catch (err) {
-      console.error("Failed to add to cart:", err);
+    } catch {
+      console.error("Failed to add to cart");
       addToast(isAr ? "حدث خطأ" : "An error occurred", "error");
     }
   }, { debounceMs: 1000 });
@@ -114,7 +114,7 @@ export default function ItemDetailPage() {
         } else {
           setError(result.error || "Failed to load item");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load item");
       } finally {
         setLoading(false);
@@ -137,7 +137,8 @@ export default function ItemDetailPage() {
       if (checked) {
         return { ...prev, [optionPrice]: optionPrice };
       } else {
-        const { [optionPrice]: _, ...rest } = prev;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [optionPrice]: _removed, ...rest } = prev;
         return rest;
       }
     });

@@ -14,7 +14,6 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { Icons } from "@/assets/icons";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function CheckoutPage() {

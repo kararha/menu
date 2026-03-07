@@ -21,7 +21,6 @@ export default function AppetizersPage() {
     loading,
     category,
     goToPage,
-    changeCategory,
   } = useMenu({
     initialPage: 1,
     initialLimit: 9,
@@ -101,7 +100,7 @@ export default function AppetizersPage() {
           ) : (
             <>
               <StaggerContainer className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item, index) => (
+                {items.map((item) => (
                   <StaggerItem key={item.id}>
                     <Link
                       href={`/${locale}/item?id=${item.id}`}

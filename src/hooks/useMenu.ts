@@ -58,7 +58,7 @@ export function useMenu(options: UseMenuOptions = {}) {
   const [error, setError] = useState<string | null>(null);
 
   const [page, setPage] = useState(initialPage);
-  const [limit, setLimit] = useState(initialLimit);
+  const [limit] = useState(initialLimit);
   const [category, setCategory] = useState(initialCategory);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("popular");
