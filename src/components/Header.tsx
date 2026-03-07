@@ -26,19 +26,19 @@ export default function Header() {
                 {/* Center Nav */}
                 <nav className="hidden items-center gap-6 md:flex">
                     <Link
-                        href={`/${locale}`}
+                        href={`/${locale}/reservations`}
                         className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
                     >
                         {t("reservations")}
                     </Link>
                     <Link
-                        href={`/${locale}`}
+                        href={`/${locale}/events`}
                         className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
                     >
                         {t("events")}
                     </Link>
                     <Link
-                        href={`/${locale}`}
+                        href={`/${locale}/gift-cards`}
                         className="text-sm font-medium text-text-secondary transition-colors hover:text-white"
                     >
                         {t("giftCards")}
